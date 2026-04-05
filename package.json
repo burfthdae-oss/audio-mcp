@@ -1,0 +1,58 @@
+{
+  "name": "audio-mcp",
+  "version": "0.1.0",
+  "description": "Local MCP server for macOS that captures microphone + system audio into explicit sessions and exposes raw WAV audio (stereo L=mic, R=system) to AI agents.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "audio-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "dist/bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x dist/index.js && npm run build:helper",
+    "build:ts": "tsc && chmod +x dist/index.js",
+    "build:helper": "./scripts/build-helper.sh",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:swift": "cd swift-helper && swift test",
+    "test:watch": "vitest",
+    "lint": "eslint 'src/**/*.ts' 'tests/**/*.ts'",
+    "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
+    "prepublishOnly": "npm run build && npm test && lipo -info dist/bin/audio-capture-helper"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "audio",
+    "recording",
+    "macos",
+    "claude",
+    "cursor"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "wavefile": "^11.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "typescript": "^5.5.3",
+    "vitest": "^1.6.0"
+  }
+}
